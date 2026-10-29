@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1b2a3a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Kale Kahramanları</title>
+  <link rel="icon" href="assets/kahraman1.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ============ OYUN SAHNESİ (16:9) ============ -->
+  <div id="stage">
+    <canvas id="cv"></canvas>
+
+    <!-- Oyun içi gösterge (HUD) -->
+    <div id="hud" class="hidden">
+      <!-- Sol üst: kahraman bilgisi -->
+      <div class="hud-hero">
+        <div class="hud-face"><img id="hudFace" alt=""><span id="hudLv" class="lv-badge">1</span></div>
+        <div class="hud-bars">
+          <div class="hud-name" id="hudName">Kahraman</div>
+          <div class="bar hp"><i id="hpFill"></i><span id="hpTxt">100/100</span></div>
+          <div class="bar xp"><i id="xpFill"></i><span id="xpTxt">0%</span></div>
+        </div>
+      </div>
+
+      <!-- Orta üst: dalga ve kale duvarı -->
+      <div class="hud-wave">
+        <div class="wave-title" id="waveTxt">Dalga 1</div>
+        <div class="bar wall"><i id="wallFill"></i><span id="wallTxt">🏰 1000/1000</span></div>
+        <button id="btnNext" class="mini-btn hidden">⚔️ Hemen Başlat <b id="breakTxt">5</b></button>
+      </div>
+
+      <!-- Sağ üst: altın ve kontroller -->
+      <div class="hud-right">
+        <div class="gold-box">🪙 <span id="goldTxt">0</span></div>
+        <button class="round-btn" id="btnSpeed" title="Hız">⏩1x</button>
+        <button class="round-btn" id="btnPause" title="Durdur">❚❚</button>
+      </div>
+
+      <!-- Sol alt: menü butonları -->
+      <div class="hud-menu">
+        <button class="menu-btn" data-tab="skills">📜<span>Skiller</span><em id="badgeSkills" class="badge hidden">!</em></button>
+        <button class="menu-btn" data-tab="upgrades">💪<span>Güçlen</span></button>
+        <button class="menu-btn" data-tab="market">🛒<span>Market</span></button>
+        <button class="menu-btn" data-tab="bag">🎒<span>Çanta</span><em id="badgeBag" class="badge hidden">0</em></button>
+      </div>
+
+      <!-- Sağ alt: 4 skill butonu -->
+      <div class="hud-skills" id="skillBar"></div>
+
+      <div class="tap-hint" id="tapHint">👆 Ekrana dokun = skill hedefi</div>
+    </div>
+
+    <div id="banner"></div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <!-- ============ ANA MENÜ ============ -->
+  <div id="mainMenu" class="screen">
+    <div class="menu-inner">
+      <h1 class="logo">🏰 Kale Kahramanları</h1>
+
+      <!-- Adım 1: kahraman seç -->
+      <div id="stepHero">
+        <h2>Kahramanını Seç</h2>
+        <div class="hero-pick" id="heroPick"></div>
+      </div>
+
+      <!-- Adım 2: sınıf seç -->
+      <div id="stepClass" class="hidden">
+        <h2><button class="back-btn" id="btnBack">←</button> <span id="classTitle">Savaş Tarzını Seç</span></h2>
+        <div class="class-pick" id="classPick"></div>
+        <div class="class-detail" id="classDetail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PANEL (Skiller / Güçlendirme / Market / Çanta) ============ -->
+  <div id="panel" class="screen hidden">
+    <div class="panel-box">
+      <div class="panel-head">
+        <div class="tabs" id="tabs">
+          <button data-tab="skills">📜 Skiller</button>
+          <button data-tab="upgrades">💪 Güçlen</button>
+          <button data-tab="market">🛒 Market</button>
+          <button data-tab="bag">🎒 Çanta</button>
+          <button data-tab="stats">📊 Bilgi</button>
+        </div>
+        <div class="gold-box">🪙 <span id="panelGold">0</span></div>
+        <button class="close-btn" id="btnClose">✕</button>
+      </div>
+      <div class="panel-body" id="panelBody"></div>
+    </div>
+  </div>
+
+  <!-- ============ DURAKLATMA ============ -->
+  <div id="pauseMenu" class="screen hidden">
+    <div class="dialog">
+      <h2>⏸ Oyun Durdu</h2>
+      <button class="big-btn" id="btnResume">▶️ Devam Et</button>
+      <button class="big-btn alt" id="btnSound">🔊 Ses: Açık</button>
+      <button class="big-btn alt" id="btnHome">🏠 Ana Menü</button>
+    </div>
+  </div>
+
+  <!-- ============ KALE DÜŞTÜ ============ -->
+  <div id="overMenu" class="screen hidden">
+    <div class="dialog">
+      <h2>🏰💥 Kale Düştü!</h2>
+      <p id="overTxt"></p>
+      <button class="big-btn" id="btnRetry">⚔️ Tekrar Savaş!</button>
+      <button class="big-btn alt" id="btnOverUp">💪 Önce Güçlen</button>
+      <button class="big-btn alt" id="btnOverHome">🏠 Ana Menü</button>
+    </div>
+  </div>
+
+  <!-- Telefon dik tutulursa uyarı -->
+  <div id="rotateHint" class="hidden">📱↻ Daha iyi oynamak için telefonu yan çevir <button id="btnRotOk">Tamam</button></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
